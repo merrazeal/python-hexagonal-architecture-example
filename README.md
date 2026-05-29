@@ -21,14 +21,14 @@
 
 ```
 src/
-├── domain/          # Доменные сущности и их правила (Payment, статусы, исключения)
+├── domain/          # Доменные сущности и их локальные правила (статусы, исключения, допустимые инварианты и т.д)
 ├── ports/           # Контракты: интерфейсы репозиториев, UoW, gateway, publisher
 ├── usecases/        # Бизнес-сценарии: create, get, process, dispatch
 ├── adapters/        # Реализации контрактов: SQLAlchemy, RabbitMQ, HTTP, payment gateway
 ├── handlers/        # Точки входа: REST routes, FastStream tasks, cron jobs
 └── boot/
-    ├── dev/         # DI-контейнер и entrypoint'ы для разработки (Stub-реализации)
-    └── test/        # DI-контейнер и entrypoint'ы для тестов (Fake-реализации)
+    ├── dev/         # DI-контейнер и entrypoint'ы для разработки (внешние Stub-реализации)
+    └── test/        # DI-контейнер и entrypoint'ы для тестов (внешние Fake-реализации)
 ```
 
 ### Полный flow платежа
