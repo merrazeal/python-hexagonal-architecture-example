@@ -71,10 +71,10 @@ services:
       timeout: 5s
       retries: 10
 
-  scheduler:
+  cron:
     build:
       context: ../..
-      dockerfile: docker/scheduler/Dockerfile.test
+      dockerfile: docker/cron/Dockerfile.test
     env_file:
       - .env.e2e
     restart: on-failure
@@ -100,5 +100,5 @@ services:
         condition: service_healthy
       worker:
         condition: service_healthy
-      scheduler:
+      cron:
         condition: service_healthy

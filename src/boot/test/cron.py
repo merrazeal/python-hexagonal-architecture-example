@@ -5,9 +5,9 @@ import queue as stdlib_queue
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
 
-from src.boot.dev.di import get_container
+from src.boot.test.di import get_container
 from src.config import settings
-from src.handlers.cron.payment import dispatch_payment_events
+from src.handlers.cron.payment import request_payment_dispatch
 from src.log_config import (create_console_handler, setup_queue_logger,
                             start_queue_listener)
 
@@ -23,20 +23,20 @@ async def main() -> None:
     container = get_container()
     scheduler = AsyncIOScheduler()
     scheduler.add_job(
-        dispatch_payment_events,
+        request_payment_dispatch,
         IntervalTrigger(seconds=settings.dispatch_interval_seconds),
-        id="dispatch_payment_events",
+        id="request_payment_dispatch",
         kwargs={"container": container},
     )
     scheduler.start()
-    logger.info("Scheduler started")
+    logger.info("Cron started")
     try:
         await asyncio.Event().wait()
     finally:
         scheduler.shutdown()
         await container.close()
         _queue_listener.stop()
-        logger.info("Scheduler stopped")
+        logger.info("Cron stopped")
 
 
 if __name__ == "__main__":

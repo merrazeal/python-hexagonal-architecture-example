@@ -88,11 +88,11 @@ services:
       timeout: 5s
       retries: 10
 
-  scheduler:
+  cron:
     build:
       context: .
-      dockerfile: docker/scheduler/Dockerfile.dev
-    container_name: payment_scheduler
+      dockerfile: docker/cron/Dockerfile.dev
+    container_name: payment_cron
     restart: always
     env_file:
       - .env.dev

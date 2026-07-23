@@ -17,7 +17,7 @@
 
 - **FastAPI** — REST API
 - **FastStream + RabbitMQ** — асинхронная обработка сообщений (worker)
-- **APScheduler** — планировщик задач (scheduler)
+- **APScheduler** — планировщик-опросник (cron), который лишь публикует триггер-событие
 - **SQLAlchemy CORE (async) + PostgreSQL** — хранение данных
 - **Alembic** — миграции
 - **Dishka** — dependency injection container
@@ -47,8 +47,12 @@ POST /api/v1/payments
   └── сохраняет запись в Outbox
         │
         ▼ (каждые N секунд)
-  Scheduler → DispatchPaymentEventsUseCase
-  └── публикует событие payment.created → RabbitMQ
+  Cron (опросник без логики)
+  └── публикует триггер payments.dispatch → RabbitMQ
+        │
+        ▼
+  Worker → DispatchPaymentEventsUseCase
+  └── читает Outbox и публикует событие payment.created → RabbitMQ
         │
         ▼
   Worker → ProcessPaymentUseCase
@@ -99,9 +103,9 @@ make unit
 
 ### E2E-тесты
 
-Поднимают полный стек в контейнерах: реальный PostgreSQL, реальный RabbitMQ, web + worker + scheduler на Fake-реализациях внешних вызовов.
+Поднимают полный стек в контейнерах: реальный PostgreSQL, реальный RabbitMQ, web + worker + cron на Fake-реализациях внешних вызовов.
 
-Тест создаёт платёж через REST API, ждёт пока scheduler опубликует событие в RabbitMQ, worker его обработает и обновит статус в базе, затем проверяет финальное состояние через GET.
+Тест создаёт платёж через REST API, ждёт пока cron опубликует триггер в RabbitMQ, worker разберёт Outbox, обработает платёж и обновит статус в базе, затем проверяет финальное состояние через GET.
 
 ```bash
 make e2e
